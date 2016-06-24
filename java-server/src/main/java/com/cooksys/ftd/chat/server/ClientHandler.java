@@ -41,7 +41,7 @@ public class ClientHandler implements Runnable, Closeable {
 			
 			while (!this.client.isClosed()) {
 				String echo = reader.readLine();
-				this.queue.put(timestamp + " " +username + ": " + echo);
+				this.queue.putLast(timestamp + " " +username + ": " + echo);
 			}
 			
 			this.close();

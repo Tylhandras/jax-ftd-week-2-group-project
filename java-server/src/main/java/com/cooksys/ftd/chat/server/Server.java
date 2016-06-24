@@ -31,6 +31,7 @@ public class Server implements Runnable {
 		log.info("Server started on port {}", this.port);
 		try (ServerSocket server = new ServerSocket(this.port)) {
 			msg = new MessageHandler(queue, handlerThreads);
+			new Thread(msg).start();
 			while (true) {
 				Socket client = server.accept();
 				log.info("Client connected {}", client.getRemoteSocketAddress());

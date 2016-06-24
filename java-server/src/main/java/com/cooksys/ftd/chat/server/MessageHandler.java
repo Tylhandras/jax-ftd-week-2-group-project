@@ -22,9 +22,13 @@ public class MessageHandler implements Runnable {
 	@Override
 	public void run() {
 		try {
-			String temp = queue.takeFirst();
-			for (ClientHandler c : handlerThreads.keySet()) {
-				c.setMessage(temp);
+			while (true) {
+				if (queue.size() > 0) {
+					String temp = queue.takeFirst();
+					for (ClientHandler c : handlerThreads.keySet()) {
+						c.setMessage(temp);
+					}
+				}
 			}
 		} catch (InterruptedException e) {
 			log.error("Message failed to send", e);
