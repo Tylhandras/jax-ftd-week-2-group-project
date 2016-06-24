@@ -6,9 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.util.concurrent.BlockingDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +19,14 @@ public class ClientHandler implements Runnable, Closeable {
 	private Socket client;
 	private PrintWriter writer;
 	private BufferedReader reader;
+	private BlockingDeque<String> queue;
 
-	public ClientHandler(Socket client) throws IOException {
+	public ClientHandler(Socket client, BlockingDeque<String> bq) throws IOException {
 		super();
 		this.client = client;
 		this.reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
 		this.writer = new PrintWriter(client.getOutputStream(), true);
+		this.queue = bq;
 	}
 
 	@Override
@@ -34,24 +35,15 @@ public class ClientHandler implements Runnable, Closeable {
 			log.info("handling client {}", this.client.getRemoteSocketAddress());
 			String username = reader.readLine().trim();
 			LocalDateTime timestamp = LocalDateTime.now();
+			log.info("Welcome to the chat [{}]",username);
+			String intro = timestamp + ": Welcome to the chat " + username;
+			this.queue.put(intro);
+			
 			while (!this.client.isClosed()) {
 				String echo = reader.readLine();
-				log.info("Welcome to the chat [{}]",username);
-				writer.printf("[%s]: Welcome to the chat [%s]",timestamp, username);
-				
-//				while(true){
-//					try{
-//						
-//					} catch{
-//						
-//					}
-//				}
-				
-				Thread.sleep(500);
-				writer.print(echo);
-				writer.flush();
-				
+				this.queue.put(timestamp + " " +username + ": " + echo);
 			}
+			
 			this.close();
 		} catch (IOException | InterruptedException e) {
 			log.error("Handler fail! oh noes :(", e);
@@ -62,6 +54,11 @@ public class ClientHandler implements Runnable, Closeable {
 	public void close() throws IOException {
 		log.info("closing connection to client {}", this.client.getRemoteSocketAddress());
 		this.client.close();
+	}
+	
+	public void setMessage (String msg) {
+		writer.print(msg);
+		writer.flush();
 	}
 
 }

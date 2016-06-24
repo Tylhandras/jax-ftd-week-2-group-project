@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
@@ -15,21 +16,25 @@ public class Server implements Runnable {
 
 	int port;
 	Map<ClientHandler, Thread> handlerThreads;
+	BlockingDeque<String> queue;
+	MessageHandler msg;
 
-	public Server(int port) {
+	public Server(int port, BlockingDeque<String> bq) {
 		super();
 		this.port = port;
 		this.handlerThreads = new ConcurrentHashMap<>();
+		this.queue = bq;
 	}
 
 	@Override
 	public void run() {
 		log.info("Server started on port {}", this.port);
 		try (ServerSocket server = new ServerSocket(this.port)) {
+			msg = new MessageHandler(queue, handlerThreads);
 			while (true) {
 				Socket client = server.accept();
 				log.info("Client connected {}", client.getRemoteSocketAddress());
-				ClientHandler clientHandler = new ClientHandler(client);
+				ClientHandler clientHandler = new ClientHandler(client, this.queue);
 				Thread clientHandlerThread = new Thread(clientHandler);
 				this.handlerThreads.put(clientHandler, clientHandlerThread);
 				clientHandlerThread.start();

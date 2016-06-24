@@ -1,5 +1,8 @@
 package com.cooksys.ftd.chat;
 
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +13,9 @@ public class Main {
 	static Logger log = LoggerFactory.getLogger(Main.class);
 	
 	public static void main(String[] args) {
-		Server server = new Server(667);
+		BlockingDeque<String> bq = new LinkedBlockingDeque<String>();
+		
+		Server server = new Server(667, bq);
 		Thread serverThread = new Thread(server);
 		serverThread.start();
 		
