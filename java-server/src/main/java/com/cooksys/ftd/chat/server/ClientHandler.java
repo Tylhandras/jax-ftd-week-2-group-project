@@ -20,7 +20,6 @@ public class ClientHandler implements Runnable, Closeable {
 	private Socket client;
 	private PrintWriter writer;
 	private BufferedReader reader;
-	private LocalDateTime timePoint = LocalDateTime.now(); 
 
 	public ClientHandler(Socket client) throws IOException {
 		super();
@@ -34,11 +33,20 @@ public class ClientHandler implements Runnable, Closeable {
 		try {
 			log.info("handling client {}", this.client.getRemoteSocketAddress());
 			String username = reader.readLine().trim();
-			LocalDate timestamp = timePoint.toLocalDate();
+			LocalDateTime timestamp = LocalDateTime.now();
 			while (!this.client.isClosed()) {
 				String echo = reader.readLine();
 				log.info("Welcome to the chat [{}]",username);
-				writer.printf("[%s]:Welcome to the chat [%s]",timestamp, username);
+				writer.printf("[%s]: Welcome to the chat [%s]",timestamp, username);
+				
+//				while(true){
+//					try{
+//						
+//					} catch{
+//						
+//					}
+//				}
+				
 				Thread.sleep(500);
 				writer.print(echo);
 				writer.flush();
