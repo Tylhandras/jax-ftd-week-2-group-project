@@ -11,12 +11,11 @@ cli
 let server
 
 cli
-  .mode('connect <port> [host]')
+  .mode('connect <username> <port> [host]')
   .delimiter('connected:')
   .init(function (args, callback) {
     server = net.createConnection(args, () => {
-      const address = server.address()
-      this.log(`connected to server ${address.address}:${address.port}`)
+      server.write(args.username + '\n')
       callback()
     })
 
@@ -25,12 +24,12 @@ cli
     })
 
     server.on('end', () => {
-      this.log('disconnected from server :(')
+      this.log('Disconnected from server')
     })
   })
   .action(function (command, callback) {
-    if (command === 'exit') {
-      server.end()
+    if (command === 'Username') {
+      server.write(command + '\n')
       callback()
     } else {
       server.write(command + '\n')
