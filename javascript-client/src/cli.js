@@ -12,11 +12,11 @@ let server
 
 cli
   .mode('connect <username> <port> [host]')
-  // .delimiter('connected:')
+  .delimiter(' ')
   .init(function (args, callback) {
     server = net.createConnection(args, () => {
       server.write(args.username + '\n')
-      this.delimiter(`${args.username}:`)
+      this.delimiter(`${args.username}`)
       callback()
     })
 
