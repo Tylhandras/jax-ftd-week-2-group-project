@@ -23,11 +23,9 @@ public class MessageHandler implements Runnable {
 	public void run() {
 		try {
 			while (true) {
-				if (queue.size() > 0) {
-					String temp = queue.takeFirst();
-					for (ClientHandler c : handlerThreads.keySet()) {
-						c.setMessage(temp);
-					}
+				String temp = queue.takeFirst();
+				for (ClientHandler c : handlerThreads.keySet()) {
+					c.setMessage(temp);
 				}
 			}
 		} catch (InterruptedException e) {
