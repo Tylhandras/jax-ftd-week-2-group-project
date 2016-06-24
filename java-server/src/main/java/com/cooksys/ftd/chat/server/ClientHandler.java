@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +20,7 @@ public class ClientHandler implements Runnable, Closeable {
 	private Socket client;
 	private PrintWriter writer;
 	private BufferedReader reader;
+	private LocalDateTime timePoint = LocalDateTime.now(); 
 
 	public ClientHandler(Socket client) throws IOException {
 		super();
@@ -29,16 +33,16 @@ public class ClientHandler implements Runnable, Closeable {
 	public void run() {
 		try {
 			log.info("handling client {}", this.client.getRemoteSocketAddress());
+			String username = reader.readLine().trim();
+			LocalDate timestamp = timePoint.toLocalDate();
 			while (!this.client.isClosed()) {
 				String echo = reader.readLine();
-				log.info("received message [{}] from client {}, echoing...", echo,
-						this.client.getRemoteSocketAddress());
+				log.info("Welcome to the chat [{}]",username);
+				writer.printf("[%s]:Welcome to the chat [%s]",timestamp, username);
 				Thread.sleep(500);
 				writer.print(echo);
 				writer.flush();
-				Thread.sleep(500);
-				writer.print(echo);
-				writer.flush();
+				
 			}
 			this.close();
 		} catch (IOException | InterruptedException e) {
