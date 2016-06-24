@@ -12,10 +12,11 @@ let server
 
 cli
   .mode('connect <username> <port> [host]')
-  .delimiter('connected:')
+  // .delimiter('connected:')
   .init(function (args, callback) {
     server = net.createConnection(args, () => {
       server.write(args.username + '\n')
+      this.delimiter(`${args.username}:`)
       callback()
     })
 
@@ -28,13 +29,8 @@ cli
     })
   })
   .action(function (command, callback) {
-    if (command === 'Username') {
-      server.write(command + '\n')
-      callback()
-    } else {
-      server.write(command + '\n')
-      callback()
-    }
+    server.write(command + '\n')
+    callback()
   })
 
 export default cli
